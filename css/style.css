@@ -1,0 +1,325 @@
+/* ======= STYLE CHUNG ======= */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400&display=swap");
+
+body {
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(circle at 20% 30%, #2b0f55, #0b031f 80%);
+    color: #eee;
+    font-family: "Inter", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* overflow: hidden; */
+}
+
+.container {
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+    animation: fadeIn 1.5s ease;
+    margin: 4em;
+}
+
+/* ======= HEADER ======= */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5em;
+}
+
+header h1 {
+    font-family: "Playfair Display", serif;
+    font-size: 1.8em;
+    color: #e0caff;
+    text-shadow: 0 0 15px #8f4ef7;
+}
+
+#sound-toggle {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #eee;
+    transition: transform 0.3s;
+}
+
+#sound-toggle:hover {
+    transform: scale(1.2);
+}
+
+/* ======= MAIN ======= */
+main h2 {
+    font-family: "Playfair Display", serif;
+    font-size: 1.3em;
+    color: #dcbfff;
+}
+
+main p {
+    font-size: 0.9em;
+    opacity: 0.8;
+    margin-bottom: 1.2em;
+}
+
+#user-question {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1em;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    text-align: center;
+}
+
+#user-question::placeholder {
+    color: #aaa;
+}
+
+#draw-btn {
+    margin-top: 1.8em;
+    padding: 12px 24px;
+    font-size: 1em;
+    background: linear-gradient(90deg, #8e2de2, #4a00e0);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(142, 45, 226, 0.6);
+    transition: all 0.4s ease;
+}
+
+#draw-btn:hover {
+    transform: scale(1.07);
+    box-shadow: 0 0 30px rgba(142, 45, 226, 0.9);
+}
+
+/* ======= FOOTER ======= */
+footer {
+    margin-top: 2em;
+    font-size: 0.85em;
+    opacity: 0.7;
+}
+
+/* ======= ANIMATION ======= */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ====== RUT BAI LAYOUT ====== */
+.card-deck {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 20px;
+    justify-items: center;
+    margin: 20px auto;
+    perspective: 1000px;
+}
+
+.card {
+    position: relative;
+    width: 120px;
+    height: 190px;
+    transform-style: preserve-3d;
+    transition: transform 0.6s ease;
+    cursor: pointer;
+    transform-origin: center center; /* ✅ Lật đúng tâm */
+}
+
+.card img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+    backface-visibility: hidden; /* ✅ Không bị thấy mặt sau khi quay */
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+}
+
+.card .front {
+    transform: rotateY(180deg);
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+}
+
+/* Hover hiệu ứng nhẹ, không làm lệch góc */
+.card:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+    box-shadow: 0 0 25px rgba(142, 45, 226, 0.6);
+}
+
+/* ====== NÚT XEM KẾT QUẢ ====== */
+#count-display {
+    margin-top: 1em;
+    font-size: 0.95em;
+    opacity: 0.85;
+}
+
+#result-btn,
+#retry-btn {
+    margin-top: 1em;
+    padding: 12px 30px;
+    font-size: 1.05em;
+    border: none;
+    border-radius: 40px;
+    color: #fff;
+    background: linear-gradient(90deg, #8e2de2, #4a00e0);
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(142, 45, 226, 0.6);
+    transition: all 0.3s ease;
+}
+
+#result-btn:hover:enabled {
+    transform: scale(1.07);
+    box-shadow: 0 0 35px rgba(142, 45, 226, 0.9);
+}
+
+#result-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 🔮 Hiệu ứng nút ma thuật */
+#draw-btn {
+    margin-top: 1.5em;
+    padding: 14px 40px;
+    font-size: 1.05em;
+    border: none;
+    border-radius: 40px;
+    color: #fff;
+    background: linear-gradient(90deg, #8e2de2, #4a00e0);
+    cursor: pointer;
+    transition: all 0.4s ease;
+    box-shadow: 0 0 20px rgba(142, 45, 226, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Khi hover */
+#draw-btn:hover:enabled {
+    transform: scale(1.05);
+    box-shadow: 0 0 35px rgba(142, 45, 226, 0.9);
+}
+
+/* Khi disable */
+#draw-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(60%);
+    box-shadow: none;
+}
+
+/* ✨ Hiệu ứng “ánh sáng di chuyển” */
+#draw-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    transform: skewX(-25deg);
+}
+
+/* Chỉ chạy khi nút được bật */
+#draw-btn:not(:disabled)::before {
+    animation: shimmer 2.2s infinite;
+}
+
+/* Keyframes cho ánh sáng chạy qua */
+@keyframes shimmer {
+    0% {
+        left: -75%;
+    }
+    50% {
+        left: 125%;
+    }
+    100% {
+        left: 125%;
+    }
+}
+
+/* css phan ket qua */
+#reading-container {
+    position: relative;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+    color: #e8dcff;
+    font-size: 1rem;
+    line-height: 1.8;
+    text-shadow: 0 0 8px #7a4ef7;
+}
+
+#locked-section {
+    position: relative;
+    text-align: center;
+    margin-top: -100px;
+    padding-top: 80px;
+}
+
+.blur-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    backdrop-filter: blur(6px);
+    background: rgba(10, 0, 25, 0.6);
+    border-radius: 12px;
+}
+
+#unlock-btn {
+    position: relative;
+    z-index: 5;
+    padding: 12px 20px;
+    font-size: 1em;
+    border: none;
+    border-radius: 40px;
+    color: #fff;
+    background: linear-gradient(90deg, #8e2de2, #4a00e0);
+    box-shadow: 0 0 12px rgba(142, 45, 226, 0.7);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#unlock-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(142, 45, 226, 0.9);
+}
+
+.hidden {
+    display: none;
+}
