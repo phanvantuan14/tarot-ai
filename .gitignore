@@ -15,12 +15,3 @@ build/
 coverage/
 .cache/
 *.log
-
-# 💻 IDE / editor
-.vscode/
-.idea/
-*.swp
-
-# 🖼️ Ảnh hoặc dữ liệu không cần thiết
-uploads/
-temp/
