@@ -1,33 +1,24 @@
-// ---------------------------
-// 🔮 Tarot AI - Backend
-// ---------------------------
-
 const express = require("express");
-const cors = require("cors");
 const path = require("path");
+require("dotenv").config();
 
-const gemini = require("./gemini"); // hoặc "./api/gemini" nếu bạn để trong thư mục api/
-
-// Khởi tạo app
 const app = express();
 
-// Middleware
-app.use(cors()); // Cho phép gọi API từ các port khác (VD: Live Server)
-app.use(express.json()); // Cho phép đọc req.body JSON
+// ✅ 1. Phục vụ toàn bộ file trong thư mục "public"
+app.use(express.static(path.join(__dirname, "public")));
 
-// Route cho API
-app.use("/api", gemini); // 👈 Route chính để gọi AI (POST /api/readTarot)
+// ✅ 2. Dùng router AI (Gemini)
+const tarotAI = require("./gemini.js");
+app.use("/api", tarotAI);
 
-// Serve frontend (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname, "public", "index.html")));
-
-// Fallback nếu người dùng truy cập trang không tồn tại
-app.use((req, res) => {
-    res.status(404).send("404 – Không tìm thấy trang 🔮");
+// ✅ 3. Nếu người dùng truy cập trang nào không có, vẫn trả về index.html
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Chạy server
+// ✅ 4. Render sẽ cung cấp cổng qua biến môi trường PORT
 const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
-    console.log(`🚀 Tarot AI Server đang chạy tại: http://localhost:${PORT}`);
+    console.log(`🔮 Tarot AI server đang chạy trên cổng ${PORT}`);
 });
