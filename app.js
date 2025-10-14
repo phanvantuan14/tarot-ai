@@ -19,7 +19,7 @@ app.use(express.json()); // Cho phép đọc req.body JSON
 app.use("/api", gemini); // 👈 Route chính để gọi AI (POST /api/readTarot)
 
 // Serve frontend (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public", "index.html")));
 
 // Fallback nếu người dùng truy cập trang không tồn tại
 app.use((req, res) => {

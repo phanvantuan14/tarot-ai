@@ -1,0 +1,26 @@
+# ⚙️ Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# 🧠 Môi trường & secrets
+.env
+.env.local
+.env.production
+.DS_Store
+
+# 🪄 Build & cache
+dist/
+build/
+coverage/
+.cache/
+*.log
+
+# 💻 IDE / editor
+.vscode/
+.idea/
+*.swp
+
+# 🖼️ Ảnh hoặc dữ liệu không cần thiết
+uploads/
+temp/
