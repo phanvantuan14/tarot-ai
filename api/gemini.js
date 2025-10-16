@@ -11,14 +11,26 @@ export default async function handler(req, res) {
 
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
+        const promptStyles = {
+            mystic: "Phong cách huyền bí, sâu sắc, dùng biểu tượng và hình ảnh ẩn dụ.",
+            poetic: "Giọng văn mềm mại, thi vị, như kể chuyện tâm linh.",
+            rational:
+                "Phân tích logic, thực tế, như người tư vấn tâm lý hiểu Tarot.",
+        };
+
+        const styleKeys = Object.keys(promptStyles);
+        const randomStyle =
+            styleKeys[Math.floor(Math.random() * styleKeys.length)];
+        const chosenStyle = promptStyles[randomStyle];
+
         const prompt = `
-        Bạn là một reader Tarot AI có phong cách huyền bí,lý luận logic, sâu sắc và ẩn dụ.
-        Câu hỏi: "${question}"
-        Ba lá bài: ${cards.join(", ")}
-        Hãy viết luận giải gồm phần như sau(nên trình bày rõ ràng từng phần):
+            Bạn là Tarot Reader AI có phong cách: ${chosenStyle}
+            Câu hỏi: "${question}"
+            Ba lá bài: ${cards.join(", ")}
+            Hãy viết 3 phần: 
             1. Năng lượng tổng thể
             2. Diễn giải từng lá
-            3. Lời khuyên từ vũ trụ gửi cho bạn thông qua 3 lá
+            3. Lời khuyên từ vũ trụ
         `;
 
         const response = await fetch(
