@@ -8,7 +8,7 @@
 //         return res.status(400).json({ error: "Thiếu dữ liệu" });
 //     }
 
-//     const prompt = `
+// const prompt = `
 // Bạn là một reader Tarot AI có phong cách huyền bí, sâu sắc và ẩn dụ.
 // Câu hỏi: "${question}"
 // Ba lá bài: ${cards.join(", ")}
@@ -65,14 +65,14 @@ export default async function handler(req, res) {
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
         const prompt = `
-      Bạn là một reader Tarot AI có phong cách huyền bí, sâu sắc và ẩn dụ.
-      Câu hỏi: "${question}"
-      Ba lá bài: ${cards.join(", ")}.
-      Hãy viết luận giải gồm:
-      1. Năng lượng tổng thể
-      2. Diễn giải từng lá
-      3. Lời khuyên từ vũ trụ
-      `;
+        Bạn là một reader Tarot AI có phong cách huyền bí, sâu sắc và ẩn dụ.
+        Câu hỏi: "${question}"
+        Ba lá bài: ${cards.join(", ")}
+        Hãy viết luận giải gồm:
+        1. Năng lượng tổng thể
+        2. Diễn giải từng lá
+        3. Lời khuyên từ vũ trụ
+        `;
 
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
