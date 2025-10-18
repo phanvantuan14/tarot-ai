@@ -52,7 +52,8 @@
         const hidden = readingText.dataset.hiddenPart || "";
         if (hidden) {
             // mở khoá: thêm phần ẩn
-            readingText.innerHTML = readingText.innerHTML + hidden;
+            // readingText.innerHTML = readingText.innerHTML + hidden;
+            readingText.innerHTML += `<div class="fade-in">${hiddenPart}</div>`;
         }
 
         // ẩn vùng locked
