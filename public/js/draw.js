@@ -48,7 +48,7 @@ selectedCards.forEach((name) => {
     card.innerHTML = `
     <img class="back" src="./assets/image/back.jfif" alt="Back">
     <img class="front" src="./assets/image/${name}.png" alt="${name}">
-  `;
+`;
     deckContainer.appendChild(card);
 });
 
