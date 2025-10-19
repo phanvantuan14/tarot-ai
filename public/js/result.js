@@ -1,4 +1,3 @@
-
 const resultContainer = document.getElementById("card-result");
 const questionDisplay = document.getElementById("question-display");
 const readingText = document.getElementById("reading-text");
@@ -34,17 +33,56 @@ function formatTarotText(text) {
         .replace(/([0-9]+\.\s)/g, "<br><br><strong>$1</strong>");
 }
 
+// function displayPartialReading(fullText) {
+//     const formatted = formatTarotText(fullText);
+//     const halfway = Math.floor(formatted.length / 2);
+//     const visiblePart = formatted.slice(0, halfway);
+//     const hiddenPart = formatted.slice(halfway);
+
+//     readingText.innerHTML = visiblePart;
+//     readingText.dataset.hiddenPart = hiddenPart;
+
+//     const locked = document.getElementById("locked-section");
+//     if (locked) locked.classList.remove("hidden");
+// }
 function displayPartialReading(fullText) {
     const formatted = formatTarotText(fullText);
+
+    // ✂️ Cắt bài làm 2 nửa
     const halfway = Math.floor(formatted.length / 2);
     const visiblePart = formatted.slice(0, halfway);
     const hiddenPart = formatted.slice(halfway);
 
-    readingText.innerHTML = visiblePart;
+    // ✅ Chèn nút ủng hộ ngay giữa
+    const unlockHTML = `
+      <div class="locked-controls" id="locked-section">
+        <button id="unlock-btn" class="unlock-btn">☕ Ủng hộ 1 ly cà phê để xem tiếp</button>
+        <p class="locked-hint">Hiển thị mã QR trong vài giây — sau đó nội dung sẽ mở khóa ✨</p>
+      </div>
+
+      <!-- modal QR -->
+      <div id="qr-modal" class="qr-modal hidden">
+        <div class="qr-card">
+          <button id="qr-close" class="qr-close">✕</button>
+          <h3>Ủng hộ Tarot AI ☕</h3>
+          <p class="qr-sub">
+            Quét mã QR bằng Momo hoặc ZaloPay để ủng hộ.
+            Sau 15 giây, nội dung còn lại sẽ được mở khóa ✨
+          </p>
+          <img id="qr-img" src="/assets/image/qr-momo.png" alt="Mã QR ủng hộ" />
+          <div class="qr-actions">
+            <button id="qr-done" class="unlock-btn">Đóng & Xem tiếp</button>
+            <span class="qr-timer" id="qr-timer">15</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    readingText.innerHTML = visiblePart + unlockHTML;
     readingText.dataset.hiddenPart = hiddenPart;
 
-    const locked = document.getElementById("locked-section");
-    if (locked) locked.classList.remove("hidden");
+    // 🎬 Gắn logic mở QR và mở khóa
+    setupUnlockLogic();
 }
 
 // ✅ Gọi đúng API serverless
@@ -71,3 +109,46 @@ async function fetchReading() {
 }
 
 setTimeout(fetchReading, 1000);
+
+function setupUnlockLogic() {
+    const unlockBtn = document.getElementById("unlock-btn");
+    const qrModal = document.getElementById("qr-modal");
+    const qrTimer = document.getElementById("qr-timer");
+    const qrClose = document.getElementById("qr-close");
+    const qrDone = document.getElementById("qr-done");
+    const hiddenPart = readingText.dataset.hiddenPart || "";
+
+    let countdown = 15;
+    let timerInterval = null;
+
+    if (!unlockBtn) return;
+
+    function openQr() {
+        qrModal.classList.remove("hidden");
+        countdown = 15;
+        qrTimer.textContent = countdown;
+
+        timerInterval = setInterval(() => {
+            countdown--;
+            qrTimer.textContent = countdown;
+            if (countdown <= 0) {
+                closeQrAndUnlock();
+            }
+        }, 1000);
+    }
+
+    function closeQr() {
+        clearInterval(timerInterval);
+        qrModal.classList.add("hidden");
+    }
+
+    function closeQrAndUnlock() {
+        closeQr();
+        readingText.innerHTML += `<div class="fade-in">${hiddenPart}</div>`;
+        sessionStorage.setItem("tarot_unlocked", "true");
+    }
+
+    unlockBtn.addEventListener("click", openQr);
+    qrClose.addEventListener("click", closeQrAndUnlock);
+    qrDone.addEventListener("click", closeQrAndUnlock);
+}
