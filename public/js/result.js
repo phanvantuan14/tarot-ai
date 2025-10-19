@@ -161,7 +161,7 @@ const readingText = document.getElementById("reading-text");
 // Bạn có thể giữ nguyên logic fetch() cũ, chỉ cần gọi displayPartialReading(result)
 async function fetchReading() {
     try {
-        const resp = await fetch("http://localhost:3000/api/readTarot", {
+        const resp = await fetch("/api/gemini", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
