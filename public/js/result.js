@@ -155,130 +155,242 @@
 
 // result.js — Hiển thị kết quả bói bài Tarot AI, ẩn một nửa, hiển thị nút ủng hộ và QR 15s
 
-const readingText = document.getElementById("reading-text");
+// result.js - flow: show half -> show unlock button after AI result -> show QR only when clicked -> hide QR after 15s -> reveal rest
 
-// === Gọi API hoặc nhận dữ liệu từ server ===
-// Bạn có thể giữ nguyên logic fetch() cũ, chỉ cần gọi displayPartialReading(result)
-async function fetchReading() {
-    try {
-        const resp = await fetch("/api/gemini", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                question,
-                cards: chosenCards,
-            }),
-        });
-        const data = await resp.json();
-        if (data.result) {
-            displayPartialReading(data.result);
-        } else {
-            readingText.textContent =
-                "Xin lỗi, mình không thể tiên tri lần này.";
-        }
-    } catch (err) {
-        console.error("Lỗi gọi API:", err);
-        readingText.textContent = "Lỗi kết nối AI.";
-    }
-}
+// --- Helpers & globals ---
+const readingText = document.getElementById("reading-text"); // vùng hiển thị toàn bài
+let alreadyUnlocked = false; // tránh unlock nhiều lần
 
-// === Hàm format văn bản (nếu bạn đã có, giữ nguyên) ===
+// Chuyển markdown-like sang HTML (đảm bảo an toàn cơ bản)
 function formatTarotText(text) {
-    return text
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\n/g, "<br>");
+    if (!text) return "";
+    // escape basic HTML entities to avoid injection if needed
+    // (giữ đơn giản; nếu text nguồn an toàn bạn có thể skip escape step)
+    const esc = (s) =>
+        s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    // thực hiện escape rồi áp markdown -> HTML (đổi **bold** và các newlines)
+    let safe = esc(text);
+    safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    safe = safe.replace(/\*(.*?)\*/g, "<em>$1</em>");
+    safe = safe.replace(/\r\n/g, "\n").replace(/\n/g, "<br>");
+    return safe;
 }
 
-// === Hiển thị nửa đầu bài + nút ủng hộ giữa ===
-function displayPartialReading(fullText) {
-    const formatted = formatTarotText(fullText);
+// Tìm điểm split an toàn dựa trên text thô (ưu tiên "2." hoặc "2. " hoặc "2. Diễn")
+function findSplitRawIndex(rawText) {
+    if (!rawText) return Math.floor(rawText.length / 2);
+    // tìm kiểu "2." xuất hiện bắt đầu một dòng
+    const patterns = ["\n2.", "\n2 ", "\n2. ", "\n2)"];
+    for (const p of patterns) {
+        const idx = rawText.indexOf(p);
+        if (idx !== -1) {
+            // split tại vị trí này (giữ "2." ở phần ẩn)
+            return idx + 1; // giữ 1 ký tự xuống dòng để "2." nằm ở phần ẩn
+        }
+    }
 
-    // ✂️ Tách bài ở vị trí hợp lý (ưu tiên phần “2.” hoặc giữa bài)
-    let splitIndex = formatted.indexOf("2.");
-    if (splitIndex === -1) splitIndex = Math.floor(formatted.length * 0.5);
+    // fallback: tách theo paragraph (đoạn) — lấy nửa số đoạn
+    const paras = rawText.split(/\n{2,}/).filter((p) => p.trim().length > 0);
+    if (paras.length >= 2) {
+        const take = Math.ceil(paras.length / 2);
+        // tính index trong rawText của cuối đoạn take-1
+        let idx = 0;
+        let count = 0;
+        for (let i = 0; i < rawText.length; i++) {
+            // increment when hitting double newline
+            if (rawText.slice(i, i + 2) === "\n\n") {
+                count++;
+                if (count === take) {
+                    idx = i + 2;
+                    break;
+                }
+            }
+        }
+        if (idx > 0) return idx;
+    }
 
-    const visiblePart = formatted.slice(0, splitIndex);
-    const hiddenPart = formatted.slice(splitIndex);
+    // cực fallback: nửa ký tự
+    return Math.floor(rawText.length / 2);
+}
 
-    // ✅ Hiển thị phần đầu và nút ủng hộ ở giữa
+// Hàm hiển thị nửa đầu và chèn nút ủng hộ (chỉ gọi khi có result)
+function displayPartialReading(fullRawText) {
+    if (!fullRawText) {
+        readingText.innerHTML = "Không có kết quả từ AI.";
+        return;
+    }
+
+    // reset trạng thái unlock nếu trước đó đã unlock
+    alreadyUnlocked = sessionStorage.getItem("tarot_unlocked") === "true";
+
+    // Nếu đã unlock trước đó (session), hiển thị hết luôn
+    if (alreadyUnlocked) {
+        readingText.innerHTML = formatTarotText(fullRawText);
+        return;
+    }
+
+    // tìm index split trên raw text (để không phá thẻ HTML)
+    const splitIndex = findSplitRawIndex(fullRawText);
+
+    const visibleRaw = fullRawText.slice(0, splitIndex).trim();
+    const hiddenRaw = fullRawText.slice(splitIndex).trim();
+
+    // format từng phần riêng biệt (để không cắt thẻ)
+    const visibleHTML = formatTarotText(visibleRaw);
+    const hiddenHTML = formatTarotText(hiddenRaw);
+
+    // LƯU phần ẩn (HTML) vào dataset (chỉ hiển thị khi unlock)
+    readingText.dataset.hiddenPart = hiddenHTML;
+
+    // tạo HTML cho visible + unlock button (không show QR lúc này)
     readingText.innerHTML = `
-    <div id="visible-part">${visiblePart}</div>
+    <div id="visible-part">${visibleHTML}</div>
 
-    <div class="locked-controls" id="locked-section">
+    <div class="locked-controls" id="locked-section" style="display:block; text-align:center; margin:28px 0;">
       <button id="unlock-btn" class="unlock-btn">☕ Ủng hộ 1 ly cà phê để xem tiếp</button>
-      <p class="locked-hint">Hiển thị mã QR trong vài giây — sau đó nội dung sẽ mở khóa ✨</p>
+      <p class="locked-hint">Quét mã QR để ủng hộ — nếu bạn muốn, phần còn lại sẽ mở sau khi bạn xem QR trong 15s.</p>
     </div>
 
-    <!-- modal QR -->
-    <div id="qr-modal" class="qr-modal hidden">
+    <!-- QR modal (ẩn) -->
+    <div id="qr-modal" class="qr-modal hidden" aria-hidden="true">
       <div class="qr-card">
         <button id="qr-close" class="qr-close">✕</button>
         <h3>Ủng hộ Tarot AI ☕</h3>
         <p class="qr-sub">
-          Quét mã QR bằng Momo hoặc ZaloPay để ủng hộ.<br>
-          Sau 15 giây, nội dung còn lại sẽ được mở khóa ✨
+          Quét mã QR bằng Momo hoặc ZaloPay.<br>
+          QR sẽ tự ẩn sau <span id="qr-timer">15</span> giây và phần còn lại sẽ được mở.
         </p>
         <img id="qr-img" src="/assets/image/qr-momo.png" alt="Mã QR ủng hộ" />
         <div class="qr-actions">
           <button id="qr-done" class="unlock-btn">Đóng & Xem tiếp</button>
-          <span class="qr-timer" id="qr-timer">15</span>
+          <span class="qr-timer" id="qr-timer-display">15</span>
         </div>
       </div>
     </div>
   `;
 
-    // Lưu phần ẩn lại để mở sau
-    readingText.dataset.hiddenPart = hiddenPart;
-
-    // Đảm bảo DOM đã render xong mới setup event
-    setTimeout(setupUnlockLogic, 200);
+    // bind events (sau khi DOM đã có các phần tử)
+    setTimeout(bindUnlockHandlers, 50);
 }
 
-// === Logic hiển thị QR & mở phần còn lại ===
-function setupUnlockLogic() {
+// --- bind handlers for unlock/QR. These run only after displayPartialReading placed elements ---
+function bindUnlockHandlers() {
     const unlockBtn = document.getElementById("unlock-btn");
     const qrModal = document.getElementById("qr-modal");
-    const qrTimer = document.getElementById("qr-timer");
     const qrClose = document.getElementById("qr-close");
     const qrDone = document.getElementById("qr-done");
-    const hiddenPart = readingText.dataset.hiddenPart || "";
+    const qrTimerDisplay = document.getElementById("qr-timer-display");
+    const lockedSection = document.getElementById("locked-section");
 
-    if (!unlockBtn) return;
+    if (!unlockBtn || !qrModal || !qrClose || !qrDone || !qrTimerDisplay) {
+        // nếu thiếu, không làm gì (bảo vệ)
+        console.warn("bindUnlockHandlers: phần tử thiếu");
+        return;
+    }
 
+    // tránh gắn event nhiều lần
+    unlockBtn.removeEventListener?.("click", openQrHandler);
+    qrClose.removeEventListener?.("click", closeAndUnlockHandler);
+    qrDone.removeEventListener?.("click", closeAndUnlockHandler);
+
+    // timer control
     let countdown = 15;
     let timerInterval = null;
+    let opened = false;
 
-    function openQr() {
+    function openQrHandler(e) {
+        e && e.preventDefault();
+        if (opened) return;
+        opened = true;
+
+        // show modal
         qrModal.classList.remove("hidden");
+        qrModal.setAttribute("aria-hidden", "false");
+        // disable body scroll
+        document.body.style.overflow = "hidden";
+
+        // init countdown
         countdown = 15;
-        qrTimer.textContent = countdown;
+        qrTimerDisplay.textContent = countdown;
 
         timerInterval = setInterval(() => {
-            countdown--;
-            qrTimer.textContent = countdown;
+            countdown -= 1;
+            qrTimerDisplay.textContent = countdown;
             if (countdown <= 0) {
-                closeQrAndUnlock();
+                clearInterval(timerInterval);
+                timerInterval = null;
+                // tự ẩn QR và unlock
+                closeAndUnlockHandler();
             }
         }, 1000);
     }
 
-    function closeQr() {
-        clearInterval(timerInterval);
+    function closeQrModal() {
+        // hide modal
         qrModal.classList.add("hidden");
+        qrModal.setAttribute("aria-hidden", "true");
+        // enable scroll
+        document.body.style.overflow = "";
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
     }
 
-    function closeQrAndUnlock() {
-        closeQr();
-        // thêm phần còn lại của bài với hiệu ứng fade-in
-        readingText.innerHTML += `<div class="fade-in">${hiddenPart}</div>`;
-        // ẩn nút ủng hộ
-        const lockedSection = document.getElementById("locked-section");
-        if (lockedSection) lockedSection.classList.add("hidden");
+    function closeAndUnlockHandler(e) {
+        e && e.preventDefault();
+        // nếu đã unlock, return
+        if (alreadyUnlocked) {
+            closeQrModal();
+            return;
+        }
+
+        // hide QR modal
+        closeQrModal();
+
+        // append hidden part (only once)
+        const hiddenHTML = readingText.dataset.hiddenPart || "";
+        if (hiddenHTML) {
+            // add with fade-in wrapper
+            const container = document.createElement("div");
+            container.className = "fade-in";
+            container.innerHTML = hiddenHTML;
+            // append after locked section
+            // find where locked section is and insert after
+            const locked = document.getElementById("locked-section");
+            if (locked && locked.parentNode) {
+                locked.parentNode.insertBefore(container, locked.nextSibling);
+            } else {
+                readingText.appendChild(container);
+            }
+        }
+
+        // hide the locked control (button area)
+        if (lockedSection) lockedSection.style.display = "none";
+
+        // mark unlocked for this session
+        alreadyUnlocked = true;
+        try {
+            sessionStorage.setItem("tarot_unlocked", "true");
+        } catch (e) {}
     }
 
-    unlockBtn.addEventListener("click", openQr);
-    qrClose.addEventListener("click", closeQrAndUnlock);
-    qrDone.addEventListener("click", closeQrAndUnlock);
+    // attach
+    unlockBtn.addEventListener("click", openQrHandler);
+    qrClose.addEventListener("click", closeAndUnlockHandler);
+    qrDone.addEventListener("click", closeAndUnlockHandler);
 }
+
+// ----------------- Example fetch flow -----------------
+// IMPORTANT: your existing flow may get the result via fetch; just call displayPartialReading(resultRaw)
+// Example usage (replace with your existing fetch logic):
+async function fetchAndShowExample() {
+    // Example: simulate API call
+    // const resp = await fetch("/api/gemini", ...); const json = await resp.json(); const resultRaw = json.result;
+    // For testing locally, you can use a hard-coded sample string below:
+    // const resultRaw = "Năng lượng tổng thể: ...\n2. Diễn giải từng lá: ...\n3. Lời khuyên: ...";
+    // displayPartialReading(resultRaw);
+}
+
+// If your existing code already calls displayPartialReading(data.result) then keep it.
+// -----------------------------------------------------
