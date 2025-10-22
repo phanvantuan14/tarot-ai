@@ -1,237 +1,115 @@
-// const resultContainer = document.getElementById("card-result");
-// const questionDisplay = document.getElementById("question-display");
-// const readingText = document.getElementById("reading-text");
-// const retryBtn = document.getElementById("retry-btn");
+const resultContainer = document.getElementById("card-result");
+const questionDisplay = document.getElementById("question-display");
+const readingText = document.getElementById("reading-text");
+const retryBtn = document.getElementById("retry-btn");
 
-// const question = localStorage.getItem("tarotQuestion");
-// questionDisplay.textContent = question
-//     ? `💭 Câu hỏi của bạn: "${question}"`
-//     : "";
+const question = localStorage.getItem("tarotQuestion");
+questionDisplay.textContent = question
+    ? `💭 Câu hỏi của bạn: "${question}"`
+    : "";
 
-// // 🔮 Lấy 3 lá bài người dùng chọn
-// const chosenCards = JSON.parse(localStorage.getItem("tarotCards")) || [];
+// 🔮 Lấy 3 lá bài người dùng chọn
+const chosenCards = JSON.parse(localStorage.getItem("tarotCards")) || [];
 
-// // Hiển thị hình ảnh 3 lá
-// chosenCards.forEach((cardName) => {
-//     const img = document.createElement("img");
-//     img.src = `./assets/image/${cardName}.png`; // ✅ không cần /public/
-//     img.alt = cardName;
-//     resultContainer.appendChild(img);
-// });
+// Hiển thị hình ảnh 3 lá
+chosenCards.forEach((cardName) => {
+    const img = document.createElement("img");
+    img.src = `./assets/image/${cardName}.png`; // ✅ không cần /public/
+    img.alt = cardName;
+    resultContainer.appendChild(img);
+});
 
-// // 🔁 Nút rút lại
-// retryBtn.addEventListener("click", () => {
-//     localStorage.removeItem("tarotCards");
-//     window.location.href = "index.html";
-// });
+// 🔁 Nút rút lại
+retryBtn.addEventListener("click", () => {
+    localStorage.removeItem("tarotCards");
+    window.location.href = "index.html";
+});
 
-// function formatTarotText(text) {
-//     return text
-//         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-//         .replace(/\*(.*?)\*/g, "<em>$1</em>")
-//         .replace(/\n/g, "<br>")
-//         .replace(/([0-9]+\.\s)/g, "<br><br><strong>$1</strong>");
-// }
+function formatTarotText(text) {
+    return text
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.*?)\*/g, "<em>$1</em>")
+        .replace(/\n/g, "<br>")
+        .replace(/([0-9]+\.\s)/g, "<br><br><strong>$1</strong>");
+}
 
-// // function displayPartialReading(fullText) {
-// //     const formatted = formatTarotText(fullText);
-// //     const halfway = Math.floor(formatted.length / 2);
-// //     const visiblePart = formatted.slice(0, halfway);
-// //     const hiddenPart = formatted.slice(halfway);
-
-// //     readingText.innerHTML = visiblePart;
-// //     readingText.dataset.hiddenPart = hiddenPart;
-
-// //     const locked = document.getElementById("locked-section");
-// //     if (locked) locked.classList.remove("hidden");
-// // }
 // function displayPartialReading(fullText) {
 //     const formatted = formatTarotText(fullText);
-
-//     // ✂️ Cắt bài làm 2 nửa
 //     const halfway = Math.floor(formatted.length / 2);
 //     const visiblePart = formatted.slice(0, halfway);
 //     const hiddenPart = formatted.slice(halfway);
 
-//     // ✅ Chèn nút ủng hộ ngay giữa
-//     const unlockHTML = `
-//       <div class="locked-controls" id="locked-section">
-//         <button id="unlock-btn" class="unlock-btn">☕ Ủng hộ 1 ly cà phê để xem tiếp</button>
-//         <p class="locked-hint">Hiển thị mã QR trong vài giây — sau đó nội dung sẽ mở khóa ✨</p>
-//       </div>
-
-//       <!-- modal QR -->
-//       <div id="qr-modal" class="qr-modal hidden">
-//         <div class="qr-card">
-//           <button id="qr-close" class="qr-close">✕</button>
-//           <h3>Ủng hộ Tarot AI ☕</h3>
-//           <p class="qr-sub">
-//             Quét mã QR bằng Momo hoặc ZaloPay để ủng hộ.
-//             Sau 15 giây, nội dung còn lại sẽ được mở khóa ✨
-//           </p>
-//           <img id="qr-img" src="/assets/image/qr-momo.png" alt="Mã QR ủng hộ" />
-//           <div class="qr-actions">
-//             <button id="qr-done" class="unlock-btn">Đóng & Xem tiếp</button>
-//             <span class="qr-timer" id="qr-timer">15</span>
-//           </div>
-//         </div>
-//       </div>
-//     `;
-
-//     readingText.innerHTML = visiblePart + unlockHTML;
+//     readingText.innerHTML = visiblePart;
 //     readingText.dataset.hiddenPart = hiddenPart;
 
-//     // 🎬 Gắn logic mở QR và mở khóa
-//     setupUnlockLogic();
+//     const locked = document.getElementById("locked-section");
+//     if (locked) locked.classList.remove("hidden");
 // }
+function displayPartialReading(fullText) {
+    const formatted = formatTarotText(fullText);
 
-// // ✅ Gọi đúng API serverless
-// async function fetchReading() {
-//     try {
-//         const response = await fetch("/api/gemini", {
-//             method: "POST",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify({ question, cards: chosenCards }), // ✅ sửa đúng biến
-//         });
+    // ✂️ Cắt bài làm 2 nửa
+    const halfway = Math.floor(formatted.length / 2);
+    const visiblePart = formatted.slice(0, halfway);
+    const hiddenPart = formatted.slice(halfway);
 
-//         const data = await response.json();
-//         console.log("Kết quả từ AI:", data.result);
+    // ✅ Chèn nút ủng hộ ngay giữa
+    const unlockHTML = `
+      <div class="locked-controls" id="locked-section">
+        <button id="unlock-btn" class="unlock-btn">☕ Ủng hộ 1 ly cà phê để xem tiếp</button>
+        <p class="locked-hint">Hiển thị mã QR trong vài giây — sau đó nội dung sẽ mở khóa ✨</p>
+      </div>
 
-//         if (data.result) {
-//             displayPartialReading(data.result);
-//         } else {
-//             readingText.textContent = "Không nhận được phản hồi từ AI.";
-//         }
-//     } catch (error) {
-//         console.error("Lỗi khi gọi API:", error);
-//         readingText.textContent = "Lỗi kết nối AI.";
-//     }
-// }
+      <!-- modal QR -->
+      <div id="qr-modal" class="qr-modal hidden">
+        <div class="qr-card">
+          <button id="qr-close" class="qr-close">✕</button>
+          <h3>Ủng hộ Tarot AI ☕</h3>
+          <p class="qr-sub">
+            Quét mã QR bằng Momo hoặc ZaloPay để ủng hộ.
+            Sau 15 giây, nội dung còn lại sẽ được mở khóa ✨
+          </p>
+          <img id="qr-img" src="/assets/image/qr-momo.png" alt="Mã QR ủng hộ" />
+          <div class="qr-actions">
+            <button id="qr-done" class="unlock-btn">Đóng & Xem tiếp</button>
+            <span class="qr-timer" id="qr-timer">15</span>
+          </div>
+        </div>
+      </div>
+    `;
 
-// setTimeout(fetchReading, 1000);
+    readingText.innerHTML = visiblePart + unlockHTML;
+    readingText.dataset.hiddenPart = hiddenPart;
 
-// function setupUnlockLogic() {
-//     const unlockBtn = document.getElementById("unlock-btn");
-//     const qrModal = document.getElementById("qr-modal");
-//     const qrTimer = document.getElementById("qr-timer");
-//     const qrClose = document.getElementById("qr-close");
-//     const qrDone = document.getElementById("qr-done");
-//     const hiddenPart = readingText.dataset.hiddenPart || "";
+    // 🎬 Gắn logic mở QR và mở khóa
+    setupUnlockLogic();
+}
 
-//     let countdown = 15;
-//     let timerInterval = null;
-
-//     if (!unlockBtn) return;
-
-//     function openQr() {
-//         qrModal.classList.remove("hidden");
-//         countdown = 15;
-//         qrTimer.textContent = countdown;
-
-//         timerInterval = setInterval(() => {
-//             countdown--;
-//             qrTimer.textContent = countdown;
-//             if (countdown <= 0) {
-//                 closeQrAndUnlock();
-//             }
-//         }, 1000);
-//     }
-
-//     function closeQr() {
-//         clearInterval(timerInterval);
-//         qrModal.classList.add("hidden");
-//     }
-
-//     function closeQrAndUnlock() {
-//         closeQr();
-//         readingText.innerHTML += `<div class="fade-in">${hiddenPart}</div>`;
-//         sessionStorage.setItem("tarot_unlocked", "true");
-//     }
-
-//     unlockBtn.addEventListener("click", openQr);
-//     qrClose.addEventListener("click", closeQrAndUnlock);
-//     qrDone.addEventListener("click", closeQrAndUnlock);
-// }
-
-// result.js — Hiển thị kết quả bói bài Tarot AI, ẩn một nửa, hiển thị nút ủng hộ và QR 15s
-
-const readingText = document.getElementById("reading-text");
-
-// === Gọi API hoặc nhận dữ liệu từ server ===
-// Bạn có thể giữ nguyên logic fetch() cũ, chỉ cần gọi displayPartialReading(result)
+// ✅ Gọi đúng API serverless
 async function fetchReading() {
     try {
-        const resp = await fetch("/api/gemini", {
+        const response = await fetch("/api/gemini", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                question,
-                cards: chosenCards,
-            }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question, cards: chosenCards }), // ✅ sửa đúng biến
         });
-        const data = await resp.json();
+
+        const data = await response.json();
+        console.log("Kết quả từ AI:", data.result);
+
         if (data.result) {
             displayPartialReading(data.result);
         } else {
-            readingText.textContent =
-                "Xin lỗi, mình không thể tiên tri lần này.";
+            readingText.textContent = "Không nhận được phản hồi từ AI.";
         }
-    } catch (err) {
-        console.error("Lỗi gọi API:", err);
+    } catch (error) {
+        console.error("Lỗi khi gọi API:", error);
         readingText.textContent = "Lỗi kết nối AI.";
     }
 }
 
-// === Hàm format văn bản (nếu bạn đã có, giữ nguyên) ===
-function formatTarotText(text) {
-    return text
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-        .replace(/\n/g, "<br>");
-}
+setTimeout(fetchReading, 1000);
 
-// === Hiển thị nửa đầu bài + nút ủng hộ giữa ===
-function displayPartialReading(fullText) {
-    const formatted = formatTarotText(fullText);
-
-    // ✂️ Tách bài ở vị trí hợp lý (ưu tiên phần “2.” hoặc giữa bài)
-    let splitIndex = formatted.indexOf("2.");
-    if (splitIndex === -1) splitIndex = Math.floor(formatted.length * 0.5);
-
-    const visiblePart = formatted.slice(0, splitIndex);
-    const hiddenPart = formatted.slice(splitIndex);
-
-    // ✅ Hiển thị phần đầu và nút ủng hộ ở giữa
-    readingText.innerHTML = `
-    <div id="visible-part">${visiblePart}</div>
-
-    <!-- modal QR -->
-    <div id="qr-modal" class="qr-modal hidden">
-      <div class="qr-card">
-        <button id="qr-close" class="qr-close">✕</button>
-        <h3>Ủng hộ Tarot AI ☕</h3>
-        <p class="qr-sub">
-          Quét mã QR bằng Momo hoặc ZaloPay để ủng hộ.<br>
-          Sau 15 giây, nội dung còn lại sẽ được mở khóa ✨
-        </p>
-        <img id="qr-img" src="/assets/image/qr-momo.png" alt="Mã QR ủng hộ" />
-        <div class="qr-actions">
-          <button id="qr-done" class="unlock-btn">Đóng & Xem tiếp</button>
-          <span class="qr-timer" id="qr-timer">15</span>
-        </div>
-      </div>
-    </div>
-  `;
-
-    // Lưu phần ẩn lại để mở sau
-    readingText.dataset.hiddenPart = hiddenPart;
-
-    // Đảm bảo DOM đã render xong mới setup event
-    setTimeout(setupUnlockLogic, 200);
-}
-
-// === Logic hiển thị QR & mở phần còn lại ===
 function setupUnlockLogic() {
     const unlockBtn = document.getElementById("unlock-btn");
     const qrModal = document.getElementById("qr-modal");
@@ -240,10 +118,10 @@ function setupUnlockLogic() {
     const qrDone = document.getElementById("qr-done");
     const hiddenPart = readingText.dataset.hiddenPart || "";
 
-    if (!unlockBtn) return;
-
     let countdown = 15;
     let timerInterval = null;
+
+    if (!unlockBtn) return;
 
     function openQr() {
         qrModal.classList.remove("hidden");
@@ -266,14 +144,141 @@ function setupUnlockLogic() {
 
     function closeQrAndUnlock() {
         closeQr();
-        // thêm phần còn lại của bài với hiệu ứng fade-in
         readingText.innerHTML += `<div class="fade-in">${hiddenPart}</div>`;
-        // ẩn nút ủng hộ
-        const lockedSection = document.getElementById("locked-section");
-        if (lockedSection) lockedSection.classList.add("hidden");
+        sessionStorage.setItem("tarot_unlocked", "true");
     }
 
     unlockBtn.addEventListener("click", openQr);
     qrClose.addEventListener("click", closeQrAndUnlock);
     qrDone.addEventListener("click", closeQrAndUnlock);
 }
+
+// result.js — Hiển thị kết quả bói bài Tarot AI, ẩn một nửa, hiển thị nút ủng hộ và QR 15s
+
+// const readingText = document.getElementById("reading-text");
+
+// // === Gọi API hoặc nhận dữ liệu từ server ===
+// // Bạn có thể giữ nguyên logic fetch() cũ, chỉ cần gọi displayPartialReading(result)
+// async function fetchReading() {
+//     try {
+//         const resp = await fetch("/api/gemini", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify({
+//                 question,
+//                 cards: chosenCards,
+//             }),
+//         });
+//         const data = await resp.json();
+//         if (data.result) {
+//             displayPartialReading(data.result);
+//         } else {
+//             readingText.textContent =
+//                 "Xin lỗi, mình không thể tiên tri lần này.";
+//         }
+//     } catch (err) {
+//         console.error("Lỗi gọi API:", err);
+//         readingText.textContent = "Lỗi kết nối AI.";
+//     }
+// }
+
+// // === Hàm format văn bản (nếu bạn đã có, giữ nguyên) ===
+// function formatTarotText(text) {
+//     return text
+//         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+//         .replace(/\n/g, "<br>");
+// }
+
+// // === Hiển thị nửa đầu bài + nút ủng hộ giữa ===
+// function displayPartialReading(fullText) {
+//     const formatted = formatTarotText(fullText);
+
+//     // ✂️ Tách bài ở vị trí hợp lý (ưu tiên phần “2.” hoặc giữa bài)
+//     let splitIndex = formatted.indexOf("2.");
+//     if (splitIndex === -1) splitIndex = Math.floor(formatted.length * 0.5);
+
+//     const visiblePart = formatted.slice(0, splitIndex);
+//     const hiddenPart = formatted.slice(splitIndex);
+
+//     // ✅ Hiển thị phần đầu và nút ủng hộ ở giữa
+//     readingText.innerHTML = `
+//     <div id="visible-part">${visiblePart}</div>
+
+//     <div class="locked-controls" id="locked-section">
+//       <button id="unlock-btn" class="unlock-btn">☕ Ủng hộ 1 ly cà phê để xem tiếp</button>
+//       <p class="locked-hint">Hiển thị mã QR trong vài giây — sau đó nội dung sẽ mở khóa ✨</p>
+//     </div>
+
+//     <!-- modal QR -->
+//     <div id="qr-modal" class="qr-modal hidden">
+//       <div class="qr-card">
+//         <button id="qr-close" class="qr-close">✕</button>
+//         <h3>Ủng hộ Tarot AI ☕</h3>
+//         <p class="qr-sub">
+//           Quét mã QR bằng Momo hoặc ZaloPay để ủng hộ.<br>
+//           Sau 15 giây, nội dung còn lại sẽ được mở khóa ✨
+//         </p>
+//         <img id="qr-img" src="/assets/image/qr-momo.png" alt="Mã QR ủng hộ" />
+//         <div class="qr-actions">
+//           <button id="qr-done" class="unlock-btn">Đóng & Xem tiếp</button>
+//           <span class="qr-timer" id="qr-timer">15</span>
+//         </div>
+//       </div>
+//     </div>
+//   `;
+
+//     // Lưu phần ẩn lại để mở sau
+//     readingText.dataset.hiddenPart = hiddenPart;
+
+//     // Đảm bảo DOM đã render xong mới setup event
+//     setTimeout(setupUnlockLogic, 200);
+// }
+
+// // === Logic hiển thị QR & mở phần còn lại ===
+// function setupUnlockLogic() {
+//     const unlockBtn = document.getElementById("unlock-btn");
+//     const qrModal = document.getElementById("qr-modal");
+//     const qrTimer = document.getElementById("qr-timer");
+//     const qrClose = document.getElementById("qr-close");
+//     const qrDone = document.getElementById("qr-done");
+//     const hiddenPart = readingText.dataset.hiddenPart || "";
+
+//     if (!unlockBtn) return;
+
+//     let countdown = 15;
+//     let timerInterval = null;
+
+//     function openQr() {
+//         qrModal.classList.remove("hidden");
+//         countdown = 15;
+//         qrTimer.textContent = countdown;
+
+//         timerInterval = setInterval(() => {
+//             countdown--;
+//             qrTimer.textContent = countdown;
+//             if (countdown <= 0) {
+//                 closeQrAndUnlock();
+//             }
+//         }, 1000);
+//     }
+
+//     function closeQr() {
+//         clearInterval(timerInterval);
+//         qrModal.classList.add("hidden");
+//     }
+
+//     function closeQrAndUnlock() {
+//         closeQr();
+//         // thêm phần còn lại của bài với hiệu ứng fade-in
+//         readingText.innerHTML += `<div class="fade-in">${hiddenPart}</div>`;
+//         // ẩn nút ủng hộ
+//         const lockedSection = document.getElementById("locked-section");
+//         if (lockedSection) lockedSection.classList.add("hidden");
+//     }
+
+//     unlockBtn.addEventListener("click", openQr);
+//     qrClose.addEventListener("click", closeQrAndUnlock);
+//     qrDone.addEventListener("click", closeQrAndUnlock);
+// }
