@@ -206,11 +206,6 @@ function displayPartialReading(fullText) {
     readingText.innerHTML = `
     <div id="visible-part">${visiblePart}</div>
 
-    <div class="locked-controls" id="locked-section">
-      <button id="unlock-btn" class="unlock-btn">☕ Ủng hộ 1 ly cà phê để xem tiếp</button>
-      <p class="locked-hint">Hiển thị mã QR trong vài giây — sau đó nội dung sẽ mở khóa ✨</p>
-    </div>
-
     <!-- modal QR -->
     <div id="qr-modal" class="qr-modal hidden">
       <div class="qr-card">
