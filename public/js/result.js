@@ -57,7 +57,7 @@ function displayPartialReading(fullText) {
             Quét mã QR bằng Momo hoặc ZaloPay để ủng hộ.
             Sau 15 giây, nội dung còn lại sẽ được mở khóa ✨
           </p>
-          <img id="qr-img" src="/assets/image/qr-momo.png" alt="Mã QR ủng hộ" />
+          <img id="qr-img" src="/assets/image/qr-momo.jfif" alt="Mã QR ủng hộ" />
           <div class="qr-actions">
             <button id="qr-done" class="unlock-btn">Đóng & Xem tiếp</button>
             <span class="qr-timer" id="qr-timer">15</span>
