@@ -111,15 +111,8 @@ function setupUnlockLogic() {
         document.body.style.overflow = "";
     }
 
-    // --- Ẩn QR + Hiện phần còn lại ---
-    function closeQrAndUnlock() {
-        closeQr();
-        // readingText.innerHTML += `<div class="fade-in">${hiddenPart}</div>`;
-        lockedSection.classList.add("hidden");
-    }
-
     unlockBtn.addEventListener("click", openQr);
-    qrClose.addEventListener("click", closeQrAndUnlock);
+    qrClose.addEventListener("click", closeQr);
     qrDone.addEventListener("click", closeQrAndUnlock);
 }
 
