@@ -60,7 +60,7 @@ function displayPartialReading(fullText) {
           Quét mã QR bằng Momo hoặc ZaloPay.<br>
           QR sẽ tự ẩn sau <span id="qr-timer">15</span> giây ✨
         </p>
-        <img id="qr-img" src="/assets/image/qr-momo.png" alt="Mã QR ủng hộ" />
+        <img id="qr-img" src="/assets/image/qr-momo.jfif" alt="Mã QR ủng hộ" />
         <div class="qr-actions">
           <button id="qr-done" class="unlock-btn">Đóng & Xem tiếp</button>
         </div>
@@ -122,16 +122,5 @@ function setupUnlockLogic() {
     qrClose.addEventListener("click", closeQrAndUnlock);
     qrDone.addEventListener("click", closeQrAndUnlock);
 }
-
-// --- Hiệu ứng fade-in (CSS có thể thêm nếu chưa có) ---
-/* 
-.fade-in {
-  animation: fadeIn 1s ease forwards;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-*/
 
 fetchReading();
