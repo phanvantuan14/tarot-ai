@@ -14,7 +14,7 @@ const chosenCards = JSON.parse(localStorage.getItem("tarotCards")) || [];
 // Hiển thị hình ảnh 3 lá
 chosenCards.forEach((cardName) => {
     const img = document.createElement("img");
-    img.src = `./assets/image/${cardName}.png`;
+    img.src = `/assets/image/${cardName}.png`;
     img.alt = cardName;
     resultContainer.appendChild(img);
 });
@@ -77,7 +77,7 @@ function displayPartialReading(fullText) {
           Quét mã QR bằng Momo hoặc ZaloPay.<br>
           Sau 15 giây, QR sẽ tự ẩn và phần còn lại sẽ được mở ✨
         </p>
-        <img id="qr-img" src="/assets/image/qr-momo.png" alt="Mã QR ủng hộ" />
+        <img id="qr-img" src="/assets/image/qr-momo.jfif" alt="Mã QR ủng hộ" />
         <div class="qr-actions">
           <button id="qr-done" class="unlock-btn">Đóng & Xem tiếp</button>
           <span class="qr-timer" id="qr-timer">15</span>
