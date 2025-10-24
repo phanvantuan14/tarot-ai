@@ -114,7 +114,7 @@ function setupUnlockLogic() {
     // --- Ẩn QR + Hiện phần còn lại ---
     function closeQrAndUnlock() {
         closeQr();
-        readingText.innerHTML += `<div class="fade-in">${hiddenPart}</div>`;
+        // readingText.innerHTML += `<div class="fade-in">${hiddenPart}</div>`;
         lockedSection.classList.add("hidden");
     }
 
